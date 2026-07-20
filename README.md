@@ -15,16 +15,7 @@ Included:
 - `runs/tox21_benchmark/benchmark_matrix.csv`: benchmark result matrix
 - `requirements.txt` and `requirements-dev.txt`: Python dependencies
 
-## What this repository does not contain
-
-This public code repository does not include submission-facing manuscript materials such as:
-
-- manuscript text
-- cover letters
-- supplementary submission files
-- author contact details
-- journal-specific packaging assets
-
+#
 ## Reproducibility workflow
 
 Install dependencies:
