@@ -1,0 +1,103 @@
+experiment:
+  name: oddd_tox21_systematic_benchmark
+  seed: 42
+  output_dir: runs/tox21_benchmark
+
+data:
+  source: tox21
+  task_type: classification
+  use_full: true
+  test_ratio: 0.2
+  cal_ratio: 0.15
+  split_protocol: scaffold
+  tox21_endpoint: NR-AR
+  tox21_endpoints:
+    - NR-AR
+    - NR-AR-LBD
+    - NR-AhR
+    - NR-Aromatase
+    - NR-ER
+    - NR-ER-LBD
+    - NR-PPAR-gamma
+    - SR-ARE
+    - SR-ATAD5
+    - SR-HSE
+    - SR-MMP
+    - SR-p53
+
+benchmark:
+  train_rf: true
+  train_xgboost: true
+  train_lightgbm: true
+  train_chemprop: true
+  chemprop_endpoints:
+    - NR-AR
+    - NR-AR-LBD
+    - NR-Aromatase
+    - NR-ER
+    - NR-ER-LBD
+    - SR-ATAD5
+    - SR-HSE
+    - SR-MMP
+    - SR-p53
+    - NR-PPAR-gamma
+    - SR-ARE
+    - NR-AhR
+  matrix_path: runs/tox21_benchmark/benchmark_matrix.parquet
+
+figures:
+  enabled: false
+
+predictor:
+  type: fingerprint_mlp
+  radius: 2
+  n_bits: 2048
+  hidden_dim: 256
+  dropout: 0.2
+  lr: 0.001
+  epochs: 25
+  batch_size: 64
+
+chemprop:
+  epochs: 15
+  batch_size: 64
+  message_hidden_dim: 300
+  depth: 3
+  dropout: 0.0
+  accelerator: cpu
+
+conformal:
+  alpha: 0.1
+  normalized_score: true  # regression only; classification uses 1-p_true without normalization
+  cluster_sources:
+    - scaffold
+    - fingerprint
+  min_group_size: 15
+  ood_routing:
+    enabled: true
+    routing_mode: similarity_only
+    use_scaffold_novelty: false
+    tanimoto_threshold: 0.35
+    conservative_multiplier: 1.5
+
+acquisition:
+  lambda_conf: 1.0
+  beta_novelty: 0.2
+  gamma_admet: 0.4
+  eta_syn: 0.3
+  maxmin_alpha_ucb: 0.7
+  random_diverse_topk_multiplier: 10
+  budget: 40
+  fill_budget: true
+  batch_constraints:
+    max_admet_risk: 0.40
+    max_syn_risk: 0.45
+    max_scaffold_redundancy: 0.30
+    max_hc_nomination_risk: 0.25
+    hc_risk_mode: high_uncertainty_active
+    hc_cap_audit: true
+
+evaluation:
+  top_k_fractions: [0.01, 0.05]
+  bootstrap_n: 5000
+  confidence_level: 0.95

@@ -1,0 +1,55 @@
+experiment:
+  name: oddd_smoke_test
+  seed: 42
+  output_dir: runs/smoke
+
+data:
+  source: synthetic
+  task_type: classification
+  n_samples: 400
+  test_ratio: 0.2
+  cal_ratio: 0.15
+  split_protocol: scaffold
+
+predictor:
+  type: fingerprint_mlp
+  fingerprint: morgan
+  radius: 2
+  n_bits: 1024
+  hidden_dim: 128
+  dropout: 0.2
+  lr: 0.001
+  epochs: 5
+  batch_size: 64
+
+conformal:
+  alpha: 0.1
+  normalized_score: true
+  cluster_sources:
+    - scaffold
+    - fingerprint
+  min_group_size: 8
+  ood_routing:
+    enabled: true
+    tanimoto_threshold: 0.35
+    conservative_multiplier: 1.5
+
+acquisition:
+  lambda_conf: 1.0
+  beta_novelty: 0.3
+  gamma_admet: 0.5
+  eta_syn: 0.4
+  budget: 20
+  batch_constraints:
+    max_admet_risk: 0.35
+    max_syn_risk: 0.40
+    max_scaffold_redundancy: 0.25
+    max_fp_risk: 0.20
+
+evaluation:
+  top_k_fractions: [0.01, 0.05]
+  bootstrap_n: 100
+  confidence_level: 0.95
+
+figures:
+  enabled: true
